@@ -1,0 +1,13 @@
+aws-cdk.core==1.75.0
+aws-cdk.aws_iam==1.68.0
+aws-cdk.aws_sns==1.68.0
+aws-cdk.aws_sns_subscriptions==1.68.0
+aws_cdk.aws_ec2==1.68.0
+aws_cdk.aws_route53==1.68.0
+aws_cdk.aws_secretsmanager==1.68.0
+aws_cdk.aws_kms==1.68.0
+cdk-ec2-key-pair==1.7.2
+aws-cdk.aws_eks==1.68.0
+aws-cdk.aws_elasticloadbalancingv2==1.68.0
+boto3
+pyyaml

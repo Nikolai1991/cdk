@@ -1,0 +1,14 @@
+global:
+  environment: "prod-cdk"
+  account_id: "<SOME_ACCOUNT_ARN>"
+  region: 'us-east-1'
+
+vpc:
+  cidr_block: "20.50.0.0/16"
+
+eks:
+  cluster_name: "prod-cdk"
+  managed_worker_nodes_nubmer: 0
+  unmanaged_worker_nodes_number: 3
+  instance_type: 't2.large'
+#  masters_role: "<SOME_ROLE_ARN>"
