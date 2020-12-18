@@ -4,7 +4,7 @@ global:
   region: 'us-east-1'
 
 vpc:
-  cidr_block: "20.50.0.0/16"
+  cidr_block: "192.168.0.0/16"
 
 eks:
   cluster_name: "prod-cdk"
