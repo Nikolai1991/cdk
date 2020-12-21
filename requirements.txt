@@ -9,5 +9,6 @@ aws_cdk.aws_kms==1.68.0
 cdk-ec2-key-pair==1.7.2
 aws-cdk.aws_eks==1.68.0
 aws-cdk.aws_elasticloadbalancingv2==1.68.0
+aws_cdk.aws_autoscaling
 boto3
 pyyaml

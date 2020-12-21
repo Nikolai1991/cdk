@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_kms as kms,
     aws_ec2 as ec2,
     aws_iam as iam,
+    aws_autoscaling as asg,
     core
 )
 from cdk_ec2_key_pair import KeyPair
@@ -44,13 +45,18 @@ class EKSStack(core.Stack):
             statement = iam.PolicyStatement(actions = ["ec2:DescribeVpcs"], resources = ["*"])
         )
         if unmanaged_worker_nodes_number > 0:
-            self.eks_cluster.add_auto_scaling_group_capacity(
+            self.asg = self.eks_cluster.add_auto_scaling_group_capacity(
                 "EKSAutoScalingGroup",
                 instance_type = ec2.InstanceType(instance_type),
                 spot_price = spot_price,
                 desired_capacity = unmanaged_worker_nodes_number,
                 key_name = self.key.name
             )
+        self.asg.add_to_role_policy(iam.PolicyStatement(actions = ["route53:*"], resources = ["*"]))
+    
+    
+    
+    
     # def deploy_tools(self,nginx_ingress=True,metrics_server=True):
     #     #Create Nginx Ingress Controller with internal NLB
     #     if nginx_ingress:
