@@ -1,6 +1,6 @@
 global:
   environment: "Team-Liran"
-  account_id: "744725459063"
+  account_id: "<ACCOUNT_ID>"
   region: 'us-east-1'
 
 vpc:
