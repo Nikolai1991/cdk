@@ -1,14 +1,14 @@
 global:
-  environment: "prod-cdk"
-  account_id: "<SOME_ACCOUNT_ARN>"
+  environment: "Team-Liran"
+  account_id: "744725459063"
   region: 'us-east-1'
 
 vpc:
   cidr_block: "192.168.0.0/16"
 
 eks:
-  cluster_name: "prod-cdk"
+  cluster_name: "Team-Liran"
   managed_worker_nodes_nubmer: 0
   unmanaged_worker_nodes_number: 3
-  instance_type: 't2.large'
+  instance_type: 't2.medium'
 #  masters_role: "<SOME_ROLE_ARN>"

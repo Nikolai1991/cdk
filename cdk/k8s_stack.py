@@ -47,29 +47,30 @@ class EKSStack(core.Stack):
             self.eks_cluster.add_auto_scaling_group_capacity(
                 "EKSAutoScalingGroup",
                 instance_type = ec2.InstanceType(instance_type),
+                lifecycle=Ec2Spot
                 desired_capacity = unmanaged_worker_nodes_number,
                 key_name = self.key.name
             )
-    def deploy_tools(self,nginx_ingress=True,metrics_server=True):
-        #Create Nginx Ingress Controller with internal NLB
-        if nginx_ingress:
-            self.eks_cluster.add_helm_chart(
-                'NginxIngress',
-                chart = 'nginx-ingress',
-                repository = 'https://helm.nginx.com/stable',
-                release = 'nginx-ingress',
-                namespace = 'tools',
-                values = {"controller":{"kind":"daemonset","ingressClass":"nginx","service":
-                    {"annotations":{"service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
-                                    "service.beta.kubernetes.io/aws-load-balancer-internal": "true",
-                                    "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true",
-                                    "service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags":"Name=nginx-ingress",
-                                    }}}})
-        #Install Metrics Server
-        if metrics_server:
-            self.eks_cluster.add_helm_chart(
-                'MetricsServer',
-                chart = 'metrics-server',
-                repository = 'https://charts.helm.sh/stable',
-                namespace = 'tools'
-            )
+    # def deploy_tools(self,nginx_ingress=True,metrics_server=True):
+    #     #Create Nginx Ingress Controller with internal NLB
+    #     if nginx_ingress:
+    #         self.eks_cluster.add_helm_chart(
+    #             'NginxIngress',
+    #             chart = 'nginx-ingress',
+    #             repository = 'https://helm.nginx.com/stable',
+    #             release = 'nginx-ingress',
+    #             namespace = 'tools',
+    #             values = {"controller":{"kind":"daemonset","ingressClass":"nginx","service":
+    #                 {"annotations":{"service.beta.kubernetes.io/aws-load-balancer-type": "nlb",
+    #                                 "service.beta.kubernetes.io/aws-load-balancer-internal": "true",
+    #                                 "service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled": "true",
+    #                                 "service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags":"Name=nginx-ingress",
+    #                                 }}}})
+    #     #Install Metrics Server
+    #     if metrics_server:
+    #         self.eks_cluster.add_helm_chart(
+    #             'MetricsServer',
+    #             chart = 'metrics-server',
+    #             repository = 'https://charts.helm.sh/stable',
+    #             namespace = 'tools'
+    #         )
