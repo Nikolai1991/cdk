@@ -1,0 +1,368 @@
+{
+  "Transform": "AWS::Serverless-2016-10-31",
+  "Resources": {
+    "kubectllayer8C2542BCBF2B4DFEB765E181FD30A9A0617C4ADA": {
+      "Type": "AWS::Serverless::Application",
+      "Properties": {
+        "Location": {
+          "ApplicationId": "arn:aws:serverlessrepo:us-east-1:903779448426:applications/lambda-layer-kubectl",
+          "SemanticVersion": "2.0.0"
+        },
+        "Parameters": {
+          "LayerName": "kubectl-c992770f0da0dd3f8f192535d3e00824"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/kubectl-layer-8C2542BC-BF2B-4DFE-B765-E181FD30A9A0/Resource"
+      }
+    },
+    "HandlerServiceRoleFCDC14AE": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Handler/ServiceRole/Resource"
+      }
+    },
+    "HandlerServiceRoleDefaultPolicyCBD0CC91": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "eks:DescribeCluster",
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "referencetoTeamLiraneks40839A7EArn"
+              }
+            },
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "referencetoTeamLiraneksCreationRole7FE8B2CEArn"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "HandlerServiceRoleDefaultPolicyCBD0CC91",
+        "Roles": [
+          {
+            "Ref": "HandlerServiceRoleFCDC14AE"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Handler/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "Handler886CB40B": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3BucketE9CEB099Ref"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKeyA91EEA71Ref"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKeyA91EEA71Ref"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "HandlerServiceRoleFCDC14AE",
+            "Arn"
+          ]
+        },
+        "Runtime": "python3.7",
+        "Description": "onEvent handler for EKS kubectl resource provider",
+        "Layers": [
+          {
+            "Fn::GetAtt": [
+              "kubectllayer8C2542BCBF2B4DFEB765E181FD30A9A0617C4ADA",
+              "Outputs.LayerVersionArn"
+            ]
+          }
+        ],
+        "MemorySize": 256,
+        "Timeout": 900,
+        "VpcConfig": {
+          "SecurityGroupIds": [
+            {
+              "Ref": "referencetoTeamLiraneks40839A7EClusterSecurityGroupId"
+            }
+          ],
+          "SubnetIds": [
+            {
+              "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet1SubnetB51350F99F1E1F2A"
+            },
+            {
+              "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet2SubnetFCB0D01C3631E767"
+            },
+            {
+              "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet3SubnetADF5C0EC3365DD58"
+            },
+            {
+              "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet4Subnet1D41161ABBB6A352"
+            }
+          ]
+        }
+      },
+      "DependsOn": [
+        "HandlerServiceRoleDefaultPolicyCBD0CC91",
+        "HandlerServiceRoleFCDC14AE"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Handler/Resource",
+        "aws:asset:path": "/Users/nikolaidavidov/Documents/Projects/customer-projects/my-projects/cdk/cdk.out/asset.b7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2",
+        "aws:asset:property": "Code"
+      }
+    },
+    "ProviderframeworkonEventServiceRole9FF04296": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Provider/framework-onEvent/ServiceRole/Resource"
+      }
+    },
+    "ProviderframeworkonEventServiceRoleDefaultPolicy48CD2133": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "lambda:InvokeFunction",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "Handler886CB40B",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "ProviderframeworkonEventServiceRoleDefaultPolicy48CD2133",
+        "Roles": [
+          {
+            "Ref": "ProviderframeworkonEventServiceRole9FF04296"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Provider/framework-onEvent/ServiceRole/DefaultPolicy/Resource"
+      }
+    },
+    "ProviderframeworkonEvent83C1D0A7": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3Bucket55C7761DRef"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKey70791098Ref"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKey70791098Ref"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "framework.onEvent",
+        "Role": {
+          "Fn::GetAtt": [
+            "ProviderframeworkonEventServiceRole9FF04296",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x",
+        "Description": "AWS CDK resource provider framework - onEvent (Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Provider)",
+        "Environment": {
+          "Variables": {
+            "USER_ON_EVENT_FUNCTION_ARN": {
+              "Fn::GetAtt": [
+                "Handler886CB40B",
+                "Arn"
+              ]
+            }
+          }
+        },
+        "Timeout": 900
+      },
+      "DependsOn": [
+        "ProviderframeworkonEventServiceRoleDefaultPolicy48CD2133",
+        "ProviderframeworkonEventServiceRole9FF04296"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/Provider/framework-onEvent/Resource",
+        "aws:asset:path": "/Users/nikolaidavidov/Documents/Projects/customer-projects/my-projects/cdk/cdk.out/asset.c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c",
+        "aws:asset:property": "Code"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.76.0,@aws-cdk/assets=1.68.0,@aws-cdk/aws-applicationautoscaling=1.68.0,@aws-cdk/aws-autoscaling=1.68.0,@aws-cdk/aws-autoscaling-common=1.68.0,@aws-cdk/aws-certificatemanager=1.68.0,@aws-cdk/aws-cloudformation=1.76.0,@aws-cdk/aws-cloudwatch=1.68.0,@aws-cdk/aws-codeguruprofiler=1.68.0,@aws-cdk/aws-ec2=1.68.0,@aws-cdk/aws-efs=1.68.0,@aws-cdk/aws-eks=1.68.0,@aws-cdk/aws-elasticloadbalancing=1.68.0,@aws-cdk/aws-elasticloadbalancingv2=1.68.0,@aws-cdk/aws-events=1.68.0,@aws-cdk/aws-iam=1.68.0,@aws-cdk/aws-kms=1.68.0,@aws-cdk/aws-lambda=1.68.0,@aws-cdk/aws-logs=1.68.0,@aws-cdk/aws-route53=1.68.0,@aws-cdk/aws-s3=1.68.0,@aws-cdk/aws-s3-assets=1.68.0,@aws-cdk/aws-sns=1.68.0,@aws-cdk/aws-sqs=1.68.0,@aws-cdk/aws-ssm=1.68.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.68.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.3"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider/CDKMetadata/Default"
+      }
+    }
+  },
+  "Outputs": {
+    "TeamLiraneksawscdkawseksKubectlProviderframeworkonEventE66ED123Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "ProviderframeworkonEvent83C1D0A7",
+          "Arn"
+        ]
+      }
+    }
+  },
+  "Parameters": {
+    "referencetoTeamLiraneks40839A7EArn": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneksCreationRole7FE8B2CEArn": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3BucketE9CEB099Ref": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKeyA91EEA71Ref": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneks40839A7EClusterSecurityGroupId": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3Bucket55C7761DRef": {
+      "Type": "String"
+    },
+    "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKey70791098Ref": {
+      "Type": "String"
+    }
+  }
+}

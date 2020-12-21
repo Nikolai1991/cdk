@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 from aws_cdk import core
 import aws_cdk.aws_ec2 as ec2
-from cdk.k8s_stack import EKSStack
-from cdk.vpc_stack import VpcStack
+from eks_and_vpc.k8s_stack import EKSStack
+from eks_and_vpc.vpc_stack import VpcStack
 from globals import *
 
 environment = config["global"]["environment"]
@@ -32,9 +32,11 @@ eks_stack = EKSStack(app, environment + "-eks",
                      # masters_role = config["eks"]["masters_role"],
                      managed_worker_nodes_nubmer = config["eks"]["managed_worker_nodes_nubmer"],
                      unmanaged_worker_nodes_number = config["eks"]["unmanaged_worker_nodes_number"],
+                     spot_price = config["eks"]["spot_price"],
+                     key_pair = config["eks"]["key_pair"],
                      instance_type = config["eks"]["instance_type"],
                      env = env)
-eks_stack.deploy_tools(nginx_ingress=True, metrics_server=False)
+# eks_stack.deploy_tools(nginx_ingress=True, metrics_server=False)
 eks_stack.add_dependency(vpc_stack)
 
 app.synth()

@@ -1,0 +1,852 @@
+{
+  "Resources": {
+    "VPCB9E5F0B4": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "192.168.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/Resource"
+      }
+    },
+    "VPCPublicSubnet1SubnetB4246D30": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.0.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1a",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/Subnet"
+      }
+    },
+    "VPCPublicSubnet1RouteTableFEE4B781": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/RouteTable"
+      }
+    },
+    "VPCPublicSubnet1RouteTableAssociation0B0896DC": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet1RouteTableFEE4B781"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnet1SubnetB4246D30"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnet1DefaultRoute91CEF279": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet1RouteTableFEE4B781"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        }
+      },
+      "DependsOn": [
+        "VPCVPCGW99B986DC"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/DefaultRoute"
+      }
+    },
+    "VPCPublicSubnet1EIP6AD938E8": {
+      "Type": "AWS::EC2::EIP",
+      "Properties": {
+        "Domain": "vpc",
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/EIP"
+      }
+    },
+    "VPCPublicSubnet1NATGatewayE0556630": {
+      "Type": "AWS::EC2::NatGateway",
+      "Properties": {
+        "AllocationId": {
+          "Fn::GetAtt": [
+            "VPCPublicSubnet1EIP6AD938E8",
+            "AllocationId"
+          ]
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnet1SubnetB4246D30"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet1/NATGateway"
+      }
+    },
+    "VPCPublicSubnet2Subnet74179F39": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.1.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1b",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet2/Subnet"
+      }
+    },
+    "VPCPublicSubnet2RouteTable6F1A15F1": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet2/RouteTable"
+      }
+    },
+    "VPCPublicSubnet2RouteTableAssociation5A808732": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet2RouteTable6F1A15F1"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnet2Subnet74179F39"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet2/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnet2DefaultRouteB7481BBA": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet2RouteTable6F1A15F1"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        }
+      },
+      "DependsOn": [
+        "VPCVPCGW99B986DC"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet2/DefaultRoute"
+      }
+    },
+    "VPCPublicSubnet3Subnet631C5E25": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.2.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1c",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet3"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet3/Subnet"
+      }
+    },
+    "VPCPublicSubnet3RouteTable98AE0E14": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet3"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet3/RouteTable"
+      }
+    },
+    "VPCPublicSubnet3RouteTableAssociation427FE0C6": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet3RouteTable98AE0E14"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnet3Subnet631C5E25"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet3/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnet3DefaultRouteA0D29D46": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet3RouteTable98AE0E14"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        }
+      },
+      "DependsOn": [
+        "VPCVPCGW99B986DC"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet3/DefaultRoute"
+      }
+    },
+    "VPCPublicSubnet4Subnet9F04368C": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.3.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1d",
+        "MapPublicIpOnLaunch": true,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public"
+          },
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet4"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet4/Subnet"
+      }
+    },
+    "VPCPublicSubnet4RouteTableEDA44FCE": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PublicSubnet4"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet4/RouteTable"
+      }
+    },
+    "VPCPublicSubnet4RouteTableAssociation6CCC557F": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet4RouteTableEDA44FCE"
+        },
+        "SubnetId": {
+          "Ref": "VPCPublicSubnet4Subnet9F04368C"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet4/RouteTableAssociation"
+      }
+    },
+    "VPCPublicSubnet4DefaultRoute190E7BE2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPublicSubnet4RouteTableEDA44FCE"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        }
+      },
+      "DependsOn": [
+        "VPCVPCGW99B986DC"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PublicSubnet4/DefaultRoute"
+      }
+    },
+    "VPCPRIVATESubnet1SubnetB51350F9": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.4.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1a",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "PRIVATE"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet1/Subnet"
+      }
+    },
+    "VPCPRIVATESubnet1RouteTable6CFFA912": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet1"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet1/RouteTable"
+      }
+    },
+    "VPCPRIVATESubnet1RouteTableAssociation6235A654": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet1RouteTable6CFFA912"
+        },
+        "SubnetId": {
+          "Ref": "VPCPRIVATESubnet1SubnetB51350F9"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet1/RouteTableAssociation"
+      }
+    },
+    "VPCPRIVATESubnet1DefaultRouteC4EE9544": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet1RouteTable6CFFA912"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnet1NATGatewayE0556630"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet1/DefaultRoute"
+      }
+    },
+    "VPCPRIVATESubnet2SubnetFCB0D01C": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.5.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1b",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "PRIVATE"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet2/Subnet"
+      }
+    },
+    "VPCPRIVATESubnet2RouteTable53CEFCDB": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet2"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet2/RouteTable"
+      }
+    },
+    "VPCPRIVATESubnet2RouteTableAssociationE319FD3F": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet2RouteTable53CEFCDB"
+        },
+        "SubnetId": {
+          "Ref": "VPCPRIVATESubnet2SubnetFCB0D01C"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet2/RouteTableAssociation"
+      }
+    },
+    "VPCPRIVATESubnet2DefaultRoute22629E11": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet2RouteTable53CEFCDB"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnet1NATGatewayE0556630"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet2/DefaultRoute"
+      }
+    },
+    "VPCPRIVATESubnet3SubnetADF5C0EC": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.6.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1c",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "PRIVATE"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet3"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet3/Subnet"
+      }
+    },
+    "VPCPRIVATESubnet3RouteTable56229851": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet3"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet3/RouteTable"
+      }
+    },
+    "VPCPRIVATESubnet3RouteTableAssociation7216355C": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet3RouteTable56229851"
+        },
+        "SubnetId": {
+          "Ref": "VPCPRIVATESubnet3SubnetADF5C0EC"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet3/RouteTableAssociation"
+      }
+    },
+    "VPCPRIVATESubnet3DefaultRoute1A6649D9": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet3RouteTable56229851"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnet1NATGatewayE0556630"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet3/DefaultRoute"
+      }
+    },
+    "VPCPRIVATESubnet4Subnet1D41161A": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "192.168.7.0/24",
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "AvailabilityZone": "us-east-1d",
+        "MapPublicIpOnLaunch": false,
+        "Tags": [
+          {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "PRIVATE"
+          },
+          {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private"
+          },
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet4"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet4/Subnet"
+      }
+    },
+    "VPCPRIVATESubnet4RouteTableB7AFEE5B": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "Tags": [
+          {
+            "Key": "kubernetes.io/role/internal-elb",
+            "Value": "1"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC/PRIVATESubnet4"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet4/RouteTable"
+      }
+    },
+    "VPCPRIVATESubnet4RouteTableAssociation9A5ADB22": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet4RouteTableB7AFEE5B"
+        },
+        "SubnetId": {
+          "Ref": "VPCPRIVATESubnet4Subnet1D41161A"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet4/RouteTableAssociation"
+      }
+    },
+    "VPCPRIVATESubnet4DefaultRouteBB7CE6F6": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "VPCPRIVATESubnet4RouteTableB7AFEE5B"
+        },
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": {
+          "Ref": "VPCPublicSubnet1NATGatewayE0556630"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/PRIVATESubnet4/DefaultRoute"
+      }
+    },
+    "VPCIGWB7E252D3": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-vpc/VPC"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/IGW"
+      }
+    },
+    "VPCVPCGW99B986DC": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "VPCB9E5F0B4"
+        },
+        "InternetGatewayId": {
+          "Ref": "VPCIGWB7E252D3"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/VPC/VPCGW"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.76.0,@aws-cdk/assets=1.68.0,@aws-cdk/aws-applicationautoscaling=1.68.0,@aws-cdk/aws-autoscaling=1.68.0,@aws-cdk/aws-autoscaling-common=1.68.0,@aws-cdk/aws-certificatemanager=1.68.0,@aws-cdk/aws-cloudformation=1.76.0,@aws-cdk/aws-cloudwatch=1.68.0,@aws-cdk/aws-codeguruprofiler=1.68.0,@aws-cdk/aws-ec2=1.68.0,@aws-cdk/aws-efs=1.68.0,@aws-cdk/aws-eks=1.68.0,@aws-cdk/aws-elasticloadbalancing=1.68.0,@aws-cdk/aws-elasticloadbalancingv2=1.68.0,@aws-cdk/aws-events=1.68.0,@aws-cdk/aws-iam=1.68.0,@aws-cdk/aws-kms=1.68.0,@aws-cdk/aws-lambda=1.68.0,@aws-cdk/aws-logs=1.68.0,@aws-cdk/aws-route53=1.68.0,@aws-cdk/aws-s3=1.68.0,@aws-cdk/aws-s3-assets=1.68.0,@aws-cdk/aws-sns=1.68.0,@aws-cdk/aws-sqs=1.68.0,@aws-cdk/aws-ssm=1.68.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.68.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.3"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-vpc/CDKMetadata/Default"
+      }
+    }
+  },
+  "Outputs": {
+    "Output": {
+      "Value": {
+        "Ref": "VPCB9E5F0B4"
+      }
+    },
+    "ExportsOutputRefVPCB9E5F0B4BD23A326": {
+      "Value": {
+        "Ref": "VPCB9E5F0B4"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCB9E5F0B4BD23A326"
+      }
+    },
+    "ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B": {
+      "Value": {
+        "Ref": "VPCPublicSubnet1SubnetB4246D30"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B"
+      }
+    },
+    "ExportsOutputRefVPCPublicSubnet2Subnet74179F3969CC10AD": {
+      "Value": {
+        "Ref": "VPCPublicSubnet2Subnet74179F39"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet2Subnet74179F3969CC10AD"
+      }
+    },
+    "ExportsOutputRefVPCPublicSubnet3Subnet631C5E25B13F8123": {
+      "Value": {
+        "Ref": "VPCPublicSubnet3Subnet631C5E25"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet3Subnet631C5E25B13F8123"
+      }
+    },
+    "ExportsOutputRefVPCPublicSubnet4Subnet9F04368C600E6070": {
+      "Value": {
+        "Ref": "VPCPublicSubnet4Subnet9F04368C"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet4Subnet9F04368C600E6070"
+      }
+    },
+    "ExportsOutputRefVPCPRIVATESubnet1SubnetB51350F99F1E1F2A": {
+      "Value": {
+        "Ref": "VPCPRIVATESubnet1SubnetB51350F9"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet1SubnetB51350F99F1E1F2A"
+      }
+    },
+    "ExportsOutputRefVPCPRIVATESubnet2SubnetFCB0D01C3631E767": {
+      "Value": {
+        "Ref": "VPCPRIVATESubnet2SubnetFCB0D01C"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet2SubnetFCB0D01C3631E767"
+      }
+    },
+    "ExportsOutputRefVPCPRIVATESubnet3SubnetADF5C0EC3365DD58": {
+      "Value": {
+        "Ref": "VPCPRIVATESubnet3SubnetADF5C0EC"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet3SubnetADF5C0EC3365DD58"
+      }
+    },
+    "ExportsOutputRefVPCPRIVATESubnet4Subnet1D41161ABBB6A352": {
+      "Value": {
+        "Ref": "VPCPRIVATESubnet4Subnet1D41161A"
+      },
+      "Export": {
+        "Name": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet4Subnet1D41161ABBB6A352"
+      }
+    }
+  }
+}

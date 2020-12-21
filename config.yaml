@@ -1,6 +1,6 @@
 global:
   environment: "Team-Liran"
-  account_id: "<ACCOUNT_ID>"
+  account_id: "<>"
   region: 'us-east-1'
 
 vpc:
@@ -8,7 +8,9 @@ vpc:
 
 eks:
   cluster_name: "Team-Liran"
+  key_pair: "Team-Liran"
   managed_worker_nodes_nubmer: 0
   unmanaged_worker_nodes_number: 3
+  spot_price: '0.1094'
   instance_type: 't2.medium'
 #  masters_role: "<SOME_ROLE_ARN>"

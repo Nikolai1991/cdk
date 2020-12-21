@@ -1,0 +1,1419 @@
+{
+  "Resources": {
+    "EKSKeyEC2KeyPairkaltura7780584D": {
+      "Type": "Custom::EC2-Key-Pair",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "EC2KeyNameManagerLambdaBE629145",
+            "Arn"
+          ]
+        },
+        "Name": "kaltura",
+        "Description": "This is a Key Pair for EKS worker nodes",
+        "KeyLength": 2048,
+        "Kms": "alias/aws/secretsmanager",
+        "RemovePrivateKeyAfterDays": 0,
+        "SecretPrefix": "ec2-private-key/",
+        "StackName": "Team-Liran-eks",
+        "Tags": {
+          "CreatedBy": "CFN::Resource::Custom::EC2-Key-Pair"
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/EKSKey/EC2-Key-Pair-kaltura/Default"
+      }
+    },
+    "EC2KeyPairManagerPolicyEBBC1576": {
+      "Type": "AWS::IAM::ManagedPolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ec2:DescribeKeyPairs",
+                "ec2:CreateKeyPair",
+                "ec2:DeleteKeyPair"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": "secretsmanager:ListSecrets",
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "secretsmanager:CreateSecret",
+                "secretsmanager:TagResource"
+              ],
+              "Condition": {
+                "StringLike": {
+                  "aws:RequestTag/CreatedBy": "CFN::Resource::Custom::EC2-Key-Pair"
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "secretsmanager:DeleteResourcePolicy",
+                "secretsmanager:DeleteSecret",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:PutResourcePolicy",
+                "secretsmanager:PutSecretValue",
+                "secretsmanager:UpdateSecret",
+                "secretsmanager:UpdateSecretVersionStage",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:RestoreSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:UntagResource"
+              ],
+              "Condition": {
+                "StringLike": {
+                  "secretsmanager:ResourceTag/CreatedBy": "CFN::Resource::Custom::EC2-Key-Pair"
+                }
+              },
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
+        "ManagedPolicyName": "Team-Liran-eks-CFN-Resource-Custom-EC2-Key-Pair",
+        "Path": "/"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/EC2-Key-Pair-Manager-Policy/Resource"
+      }
+    },
+    "EC2KeyPairManagerRoleB243C519": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "Description": "Used by Lambda CFN-Resource-Custom-EC2-Key-Pair, which is a custom CFN resource, managing EC2 Key Pairs",
+        "ManagedPolicyArns": [
+          {
+            "Ref": "EC2KeyPairManagerPolicyEBBC1576"
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+              ]
+            ]
+          }
+        ],
+        "RoleName": "Team-Liran-eks-CFN-Resource-Custom-EC2-Key-Pair"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/EC2-Key-Pair-Manager-Role/Resource"
+      }
+    },
+    "EC2KeyNameManagerLambdaBE629145": {
+      "Type": "AWS::Lambda::Function",
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930S3Bucket08590A99"
+          },
+          "S3Key": {
+            "Fn::Join": [
+              "",
+              [
+                {
+                  "Fn::Select": [
+                    0,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930S3VersionKeyF41B9EA2"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "Fn::Select": [
+                    1,
+                    {
+                      "Fn::Split": [
+                        "||",
+                        {
+                          "Ref": "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930S3VersionKeyF41B9EA2"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        },
+        "Handler": "index.handler",
+        "Role": {
+          "Fn::GetAtt": [
+            "EC2KeyPairManagerRoleB243C519",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs10.x",
+        "Description": "Custom CFN resource: Manage EC2 Key Pairs",
+        "FunctionName": "Team-Liran-eks-CFN-Resource-Custom-EC2-Key-Pair",
+        "Timeout": 180
+      },
+      "DependsOn": [
+        "EC2KeyPairManagerRoleB243C519"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/EC2-Key-Name-Manager-Lambda/Resource",
+        "aws:asset:path": "/Users/nikolaidavidov/Documents/Projects/customer-projects/my-projects/cdk/cdk.out/asset.e768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930.zip",
+        "aws:asset:property": "Code"
+      }
+    },
+    "kmseksCC89BD06": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "KeyPolicy": {
+          "Statement": [
+            {
+              "Action": [
+                "kms:Create*",
+                "kms:Describe*",
+                "kms:Enable*",
+                "kms:List*",
+                "kms:Put*",
+                "kms:Update*",
+                "kms:Revoke*",
+                "kms:Disable*",
+                "kms:Get*",
+                "kms:Delete*",
+                "kms:ScheduleKeyDeletion",
+                "kms:CancelKeyDeletion",
+                "kms:GenerateDataKey",
+                "kms:TagResource",
+                "kms:UntagResource"
+              ],
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::744725459063:root"
+                    ]
+                  ]
+                }
+              },
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "UpdateReplacePolicy": "Retain",
+      "DeletionPolicy": "Retain",
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/kms_eks/Resource"
+      }
+    },
+    "kmseksAlias5C7714D7": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/kms_eks",
+        "TargetKeyId": {
+          "Fn::GetAtt": [
+            "kmseksCC89BD06",
+            "Arn"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/kms_eks/Alias/Resource"
+      }
+    },
+    "eksRoleB1016F54": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "eks.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEKSClusterPolicy"
+              ]
+            ]
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/Role/Resource"
+      }
+    },
+    "eksRoleDefaultPolicy6793F81D": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "ec2:DescribeVpcs",
+              "Effect": "Allow",
+              "Resource": "*"
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "eksRoleDefaultPolicy6793F81D",
+        "Roles": [
+          {
+            "Ref": "eksRoleB1016F54"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/Role/DefaultPolicy/Resource"
+      }
+    },
+    "eksControlPlaneSecurityGroup6FA7F5AA": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "EKS Control Plane Security Group",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCB9E5F0B4BD23A326"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/ControlPlaneSecurityGroup/Resource"
+      }
+    },
+    "eksControlPlaneSecurityGroupfromTeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B54439AC81FD7": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:443",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksControlPlaneSecurityGroup6FA7F5AA",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "ToPort": 443
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/ControlPlaneSecurityGroup/from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:443"
+      }
+    },
+    "eksCreationRoleF889249E": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::744725459063:root"
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/Resource/CreationRole/Resource"
+      }
+    },
+    "eksCreationRoleDefaultPolicy2BC94837": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": "iam:PassRole",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "eksRoleB1016F54",
+                  "Arn"
+                ]
+              }
+            },
+            {
+              "Action": [
+                "ec2:DescribeSubnets",
+                "ec2:DescribeRouteTables"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": [
+                "eks:CreateCluster",
+                "eks:DescribeCluster",
+                "eks:DescribeUpdate",
+                "eks:DeleteCluster",
+                "eks:UpdateClusterVersion",
+                "eks:UpdateClusterConfig",
+                "eks:CreateFargateProfile",
+                "eks:TagResource",
+                "eks:UntagResource"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":eks:us-east-1:744725459063:cluster/Team-Liran"
+                    ]
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":eks:us-east-1:744725459063:cluster/Team-Liran/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Action": [
+                "eks:DescribeFargateProfile",
+                "eks:DeleteFargateProfile"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":eks:us-east-1:744725459063:fargateprofile/Team-Liran/*"
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": [
+                "iam:GetRole",
+                "iam:listAttachedRolePolicies"
+              ],
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": "iam:CreateServiceLinkedRole",
+              "Effect": "Allow",
+              "Resource": "*"
+            },
+            {
+              "Action": "ec2:DescribeVpcs",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":ec2:us-east-1:744725459063:vpc/",
+                    {
+                      "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCB9E5F0B4BD23A326"
+                    }
+                  ]
+                ]
+              }
+            },
+            {
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:CreateGrant"
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "kmseksCC89BD06",
+                  "Arn"
+                ]
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "eksCreationRoleDefaultPolicy2BC94837",
+        "Roles": [
+          {
+            "Ref": "eksCreationRoleF889249E"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/Resource/CreationRole/DefaultPolicy/Resource"
+      }
+    },
+    "eksB49B8EA3": {
+      "Type": "Custom::AWSCDK-EKS-Cluster",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454",
+            "Outputs.TeamLiraneksawscdkawseksClusterResourceProviderframeworkonEventA9A7CC94Arn"
+          ]
+        },
+        "Config": {
+          "name": "Team-Liran",
+          "version": "1.18",
+          "roleArn": {
+            "Fn::GetAtt": [
+              "eksRoleB1016F54",
+              "Arn"
+            ]
+          },
+          "encryptionConfig": [
+            {
+              "provider": {
+                "keyArn": {
+                  "Fn::GetAtt": [
+                    "kmseksCC89BD06",
+                    "Arn"
+                  ]
+                }
+              },
+              "resources": [
+                "secrets"
+              ]
+            }
+          ],
+          "resourcesVpcConfig": {
+            "subnetIds": [
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet1SubnetB4246D30D84F935B"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet2Subnet74179F3969CC10AD"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet3Subnet631C5E25B13F8123"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPublicSubnet4Subnet9F04368C600E6070"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet1SubnetB51350F99F1E1F2A"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet2SubnetFCB0D01C3631E767"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet3SubnetADF5C0EC3365DD58"
+              },
+              {
+                "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet4Subnet1D41161ABBB6A352"
+              }
+            ],
+            "securityGroupIds": [
+              {
+                "Fn::GetAtt": [
+                  "eksControlPlaneSecurityGroup6FA7F5AA",
+                  "GroupId"
+                ]
+              }
+            ],
+            "endpointPublicAccess": true,
+            "endpointPrivateAccess": true
+          }
+        },
+        "AssumeRoleArn": {
+          "Fn::GetAtt": [
+            "eksCreationRoleF889249E",
+            "Arn"
+          ]
+        },
+        "AttributesRevision": 2
+      },
+      "DependsOn": [
+        "eksCreationRoleDefaultPolicy2BC94837",
+        "eksCreationRoleF889249E"
+      ],
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/Resource/Resource/Default"
+      }
+    },
+    "eksKubectlReadyBarrier096EB7ED": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Type": "String",
+        "Value": "aws:cdk:eks:kubectl-ready"
+      },
+      "DependsOn": [
+        "eksCreationRoleDefaultPolicy2BC94837",
+        "eksCreationRoleF889249E",
+        "eksB49B8EA3"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/KubectlReadyBarrier"
+      }
+    },
+    "eksClusterSecurityGroupfromTeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5443747C31B9": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:443",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksB49B8EA3",
+            "ClusterSecurityGroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "ToPort": 443
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/ClusterSecurityGroup/from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:443"
+      }
+    },
+    "eksMastersRole8C7B8590": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":iam::744725459063:root"
+                    ]
+                  ]
+                }
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/MastersRole/Resource"
+      }
+    },
+    "eksAwsAuthmanifest7EA83A4A": {
+      "Type": "Custom::AWSCDK-EKS-KubernetesResource",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "awscdkawseksKubectlProviderNestedStackawscdkawseksKubectlProviderNestedStackResourceA7AEBA6B",
+            "Outputs.TeamLiraneksawscdkawseksKubectlProviderframeworkonEventE66ED123Arn"
+          ]
+        },
+        "Manifest": {
+          "Fn::Join": [
+            "",
+            [
+              "[{\"apiVersion\":\"v1\",\"kind\":\"ConfigMap\",\"metadata\":{\"name\":\"aws-auth\",\"namespace\":\"kube-system\"},\"data\":{\"mapRoles\":\"[{\\\"rolearn\\\":\\\"",
+              {
+                "Fn::GetAtt": [
+                  "eksMastersRole8C7B8590",
+                  "Arn"
+                ]
+              },
+              "\\\",\\\"username\\\":\\\"",
+              {
+                "Fn::GetAtt": [
+                  "eksMastersRole8C7B8590",
+                  "Arn"
+                ]
+              },
+              "\\\",\\\"groups\\\":[\\\"system:masters\\\"]},{\\\"rolearn\\\":\\\"",
+              {
+                "Fn::GetAtt": [
+                  "eksEKSAutoScalingGroupInstanceRole69FDDB41",
+                  "Arn"
+                ]
+              },
+              "\\\",\\\"username\\\":\\\"system:node:{{EC2PrivateDNSName}}\\\",\\\"groups\\\":[\\\"system:bootstrappers\\\",\\\"system:nodes\\\"]}]\",\"mapUsers\":\"[]\",\"mapAccounts\":\"[]\"}}]"
+            ]
+          ]
+        },
+        "ClusterName": {
+          "Ref": "eksB49B8EA3"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "eksCreationRoleF889249E",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "eksKubectlReadyBarrier096EB7ED"
+      ],
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/AwsAuth/manifest/Resource/Default"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1"
+          }
+        ],
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  "kubernetes.io/cluster/",
+                  {
+                    "Ref": "eksB49B8EA3"
+                  }
+                ]
+              ]
+            },
+            "Value": "owned"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-eks/eks/EKSAutoScalingGroup"
+          }
+        ],
+        "VpcId": {
+          "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCB9E5F0B4BD23A326"
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/Resource"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroupfromTeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5ALLTRAFFIC8D7A307E": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "-1",
+        "Description": "from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:ALL TRAFFIC",
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/from TeamLiraneksEKSAutoScalingGroupInstanceSecurityGroup73B968B5:ALL TRAFFIC"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroupfromTeamLiraneksClusterSecurityGroupA95D75DA44372C0A786": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksClusterSecurityGroupA95D75DA:443",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksB49B8EA3",
+            "ClusterSecurityGroupId"
+          ]
+        },
+        "ToPort": 443
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/from TeamLiraneksClusterSecurityGroupA95D75DA:443"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroupfromTeamLiraneksControlPlaneSecurityGroupCF55334E443CCF1853B": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksControlPlaneSecurityGroupCF55334E:443",
+        "FromPort": 443,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksControlPlaneSecurityGroup6FA7F5AA",
+            "GroupId"
+          ]
+        },
+        "ToPort": 443
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/from TeamLiraneksControlPlaneSecurityGroupCF55334E:443"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroupfromTeamLiraneksClusterSecurityGroupA95D75DA102565535CD6EA930": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksClusterSecurityGroupA95D75DA:1025-65535",
+        "FromPort": 1025,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksB49B8EA3",
+            "ClusterSecurityGroupId"
+          ]
+        },
+        "ToPort": 65535
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/from TeamLiraneksClusterSecurityGroupA95D75DA:1025-65535"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceSecurityGroupfromTeamLiraneksControlPlaneSecurityGroupCF55334E1025655354C897A4F": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "IpProtocol": "tcp",
+        "Description": "from TeamLiraneksControlPlaneSecurityGroupCF55334E:1025-65535",
+        "FromPort": 1025,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+            "GroupId"
+          ]
+        },
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "eksControlPlaneSecurityGroup6FA7F5AA",
+            "GroupId"
+          ]
+        },
+        "ToPort": 65535
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceSecurityGroup/from TeamLiraneksControlPlaneSecurityGroupCF55334E:1025-65535"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceRole69FDDB41": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ec2.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEKSWorkerNodePolicy"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEKS_CNI_Policy"
+              ]
+            ]
+          },
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition"
+                },
+                ":iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+              ]
+            ]
+          }
+        ],
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  "kubernetes.io/cluster/",
+                  {
+                    "Ref": "eksB49B8EA3"
+                  }
+                ]
+              ]
+            },
+            "Value": "owned"
+          },
+          {
+            "Key": "Name",
+            "Value": "Team-Liran-eks/eks/EKSAutoScalingGroup"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceRole/Resource"
+      }
+    },
+    "eksEKSAutoScalingGroupInstanceProfile0C69D975": {
+      "Type": "AWS::IAM::InstanceProfile",
+      "Properties": {
+        "Roles": [
+          {
+            "Ref": "eksEKSAutoScalingGroupInstanceRole69FDDB41"
+          }
+        ]
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/InstanceProfile"
+      }
+    },
+    "eksEKSAutoScalingGroupLaunchConfig6706BF3C": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": {
+          "Ref": "SsmParameterValueawsserviceeksoptimizedami118amazonlinux2recommendedimageidC96584B6F00A464EAD1953AFF4B05118Parameter"
+        },
+        "InstanceType": "t2.medium",
+        "IamInstanceProfile": {
+          "Ref": "eksEKSAutoScalingGroupInstanceProfile0C69D975"
+        },
+        "KeyName": {
+          "Fn::GetAtt": [
+            "EKSKeyEC2KeyPairkaltura7780584D",
+            "KeyPairName"
+          ]
+        },
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "eksEKSAutoScalingGroupInstanceSecurityGroup5A57E0D6",
+              "GroupId"
+            ]
+          }
+        ],
+        "SpotPrice": "0.1094",
+        "UserData": {
+          "Fn::Base64": {
+            "Fn::Join": [
+              "",
+              [
+                "#!/bin/bash\nset -o xtrace\n/etc/eks/bootstrap.sh ",
+                {
+                  "Ref": "eksB49B8EA3"
+                },
+                " --kubelet-extra-args \"--node-labels lifecycle=Ec2Spot --register-with-taints=spotInstance=true:PreferNoSchedule\" --use-max-pods true\n/opt/aws/bin/cfn-signal --exit-code $? --stack Team-Liran-eks --resource eksEKSAutoScalingGroupASG553916A6 --region us-east-1"
+              ]
+            ]
+          }
+        }
+      },
+      "DependsOn": [
+        "eksEKSAutoScalingGroupInstanceRole69FDDB41"
+      ],
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/LaunchConfig"
+      }
+    },
+    "eksEKSAutoScalingGroupASG553916A6": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "MaxSize": "3",
+        "MinSize": "1",
+        "DesiredCapacity": "3",
+        "LaunchConfigurationName": {
+          "Ref": "eksEKSAutoScalingGroupLaunchConfig6706BF3C"
+        },
+        "Tags": [
+          {
+            "Key": {
+              "Fn::Join": [
+                "",
+                [
+                  "kubernetes.io/cluster/",
+                  {
+                    "Ref": "eksB49B8EA3"
+                  }
+                ]
+              ]
+            },
+            "PropagateAtLaunch": true,
+            "Value": "owned"
+          },
+          {
+            "Key": "Name",
+            "PropagateAtLaunch": true,
+            "Value": "Team-Liran-eks/eks/EKSAutoScalingGroup"
+          }
+        ],
+        "VPCZoneIdentifier": [
+          {
+            "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet1SubnetB51350F99F1E1F2A"
+          },
+          {
+            "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet2SubnetFCB0D01C3631E767"
+          },
+          {
+            "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet3SubnetADF5C0EC3365DD58"
+          },
+          {
+            "Fn::ImportValue": "Team-Liran-vpc:ExportsOutputRefVPCPRIVATESubnet4Subnet1D41161ABBB6A352"
+          }
+        ]
+      },
+      "UpdatePolicy": {
+        "AutoScalingScheduledAction": {
+          "IgnoreUnmodifiedGroupSizeProperties": true
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/EKSAutoScalingGroup/ASG"
+      }
+    },
+    "ekschartspotinterrupthandler141763B1": {
+      "Type": "Custom::AWSCDK-EKS-HelmChart",
+      "Properties": {
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "awscdkawseksKubectlProviderNestedStackawscdkawseksKubectlProviderNestedStackResourceA7AEBA6B",
+            "Outputs.TeamLiraneksawscdkawseksKubectlProviderframeworkonEventE66ED123Arn"
+          ]
+        },
+        "ClusterName": {
+          "Ref": "eksB49B8EA3"
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "eksCreationRoleF889249E",
+            "Arn"
+          ]
+        },
+        "Release": "teamliranekschartspotinterrupthandler9a1b01e6",
+        "Chart": "aws-node-termination-handler",
+        "Version": "0.9.5",
+        "Values": "{\"nodeSelector.lifecycle\":\"Ec2Spot\"}",
+        "Namespace": "kube-system",
+        "Repository": "https://aws.github.io/eks-charts",
+        "CreateNamespace": true
+      },
+      "DependsOn": [
+        "eksKubectlReadyBarrier096EB7ED"
+      ],
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete",
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/eks/chart-spot-interrupt-handler/Resource/Default"
+      }
+    },
+    "awscdkawseksClusterResourceProviderNestedStackawscdkawseksClusterResourceProviderNestedStackResource9827C454": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "",
+            [
+              "https://s3.us-east-1.",
+              {
+                "Ref": "AWS::URLSuffix"
+              },
+              "/",
+              {
+                "Ref": "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5S3BucketCD567969"
+              },
+              "/",
+              {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "||",
+                      {
+                        "Ref": "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5S3VersionKey47EB1612"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Fn::Select": [
+                  1,
+                  {
+                    "Fn::Split": [
+                      "||",
+                      {
+                        "Ref": "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5S3VersionKey47EB1612"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        "Parameters": {
+          "referencetoTeamLiraneksCreationRole7FE8B2CEArn": {
+            "Fn::GetAtt": [
+              "eksCreationRoleF889249E",
+              "Arn"
+            ]
+          },
+          "referencetoTeamLiraneksAssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3Bucket23897F56Ref": {
+            "Ref": "AssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3Bucket36C546E0"
+          },
+          "referencetoTeamLiraneksAssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3VersionKey39C33CABRef": {
+            "Ref": "AssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3VersionKey85C003F9"
+          },
+          "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3Bucket55C7761DRef": {
+            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43"
+          },
+          "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKey70791098Ref": {
+            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.ClusterResourceProvider.NestedStack/@aws-cdk--aws-eks.ClusterResourceProvider.NestedStackResource"
+      }
+    },
+    "awscdkawseksKubectlProviderNestedStackawscdkawseksKubectlProviderNestedStackResourceA7AEBA6B": {
+      "Type": "AWS::CloudFormation::Stack",
+      "Properties": {
+        "TemplateURL": {
+          "Fn::Join": [
+            "",
+            [
+              "https://s3.us-east-1.",
+              {
+                "Ref": "AWS::URLSuffix"
+              },
+              "/",
+              {
+                "Ref": "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aS3Bucket25F8FF44"
+              },
+              "/",
+              {
+                "Fn::Select": [
+                  0,
+                  {
+                    "Fn::Split": [
+                      "||",
+                      {
+                        "Ref": "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aS3VersionKeyBFD7E367"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "Fn::Select": [
+                  1,
+                  {
+                    "Fn::Split": [
+                      "||",
+                      {
+                        "Ref": "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aS3VersionKeyBFD7E367"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          ]
+        },
+        "Parameters": {
+          "referencetoTeamLiraneks40839A7EArn": {
+            "Fn::GetAtt": [
+              "eksB49B8EA3",
+              "Arn"
+            ]
+          },
+          "referencetoTeamLiraneksCreationRole7FE8B2CEArn": {
+            "Fn::GetAtt": [
+              "eksCreationRoleF889249E",
+              "Arn"
+            ]
+          },
+          "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3BucketE9CEB099Ref": {
+            "Ref": "AssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3Bucket9ABBD5A2"
+          },
+          "referencetoTeamLiraneksAssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKeyA91EEA71Ref": {
+            "Ref": "AssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKey40FF2C4A"
+          },
+          "referencetoTeamLiraneks40839A7EClusterSecurityGroupId": {
+            "Fn::GetAtt": [
+              "eksB49B8EA3",
+              "ClusterSecurityGroupId"
+            ]
+          },
+          "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3Bucket55C7761DRef": {
+            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43"
+          },
+          "referencetoTeamLiraneksAssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKey70791098Ref": {
+            "Ref": "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7"
+          }
+        }
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/@aws-cdk--aws-eks.KubectlProvider.NestedStack/@aws-cdk--aws-eks.KubectlProvider.NestedStackResource"
+      }
+    },
+    "CDKMetadata": {
+      "Type": "AWS::CDK::Metadata",
+      "Properties": {
+        "Modules": "aws-cdk=1.76.0,@aws-cdk/assets=1.68.0,@aws-cdk/aws-applicationautoscaling=1.68.0,@aws-cdk/aws-autoscaling=1.68.0,@aws-cdk/aws-autoscaling-common=1.68.0,@aws-cdk/aws-certificatemanager=1.68.0,@aws-cdk/aws-cloudformation=1.76.0,@aws-cdk/aws-cloudwatch=1.68.0,@aws-cdk/aws-codeguruprofiler=1.68.0,@aws-cdk/aws-ec2=1.68.0,@aws-cdk/aws-efs=1.68.0,@aws-cdk/aws-eks=1.68.0,@aws-cdk/aws-elasticloadbalancing=1.68.0,@aws-cdk/aws-elasticloadbalancingv2=1.68.0,@aws-cdk/aws-events=1.68.0,@aws-cdk/aws-iam=1.68.0,@aws-cdk/aws-kms=1.68.0,@aws-cdk/aws-lambda=1.68.0,@aws-cdk/aws-logs=1.68.0,@aws-cdk/aws-route53=1.68.0,@aws-cdk/aws-s3=1.68.0,@aws-cdk/aws-s3-assets=1.68.0,@aws-cdk/aws-sns=1.68.0,@aws-cdk/aws-sqs=1.68.0,@aws-cdk/aws-ssm=1.68.0,@aws-cdk/cloud-assembly-schema=1.75.0,@aws-cdk/core=1.75.0,@aws-cdk/custom-resources=1.68.0,@aws-cdk/cx-api=1.75.0,@aws-cdk/region-info=1.75.0,jsii-runtime=Python/3.7.3"
+      },
+      "Metadata": {
+        "aws:cdk:path": "Team-Liran-eks/CDKMetadata/Default"
+      }
+    }
+  },
+  "Parameters": {
+    "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930S3Bucket08590A99": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"e768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930\""
+    },
+    "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930S3VersionKeyF41B9EA2": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"e768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930\""
+    },
+    "AssetParameterse768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930ArtifactHash6A8060AD": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"e768146ff9a6057a6a6d2691cae71f5d2eb23c086e978c332e073621c8176930\""
+    },
+    "AssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3Bucket36C546E0": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1\""
+    },
+    "AssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1S3VersionKey85C003F9": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1\""
+    },
+    "AssetParameters50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1ArtifactHash32F5D823": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"50e10880d134a01b440991fc77d217f39f01c2d56945215ee9a3b81187c6f3b1\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3BucketEAC9DD43": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cS3VersionKeyDD9AE9E7": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParametersc691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49cArtifactHash627DAAA7": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"c691172cdeefa2c91b5a2907f9d81118e47597634943344795f1a844192dd49c\""
+    },
+    "AssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3Bucket9ABBD5A2": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"b7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2\""
+    },
+    "AssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2S3VersionKey40FF2C4A": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"b7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2\""
+    },
+    "AssetParametersb7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2ArtifactHashE86B38C7": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"b7d8a9750f8bfded8ac76be100e3bee1c3d4824df006766110d023f42952f5c2\""
+    },
+    "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5S3BucketCD567969": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"de8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5\""
+    },
+    "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5S3VersionKey47EB1612": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"de8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5\""
+    },
+    "AssetParametersde8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5ArtifactHash3DC313EB": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"de8c3a6ef83828bdf0ea230a8847a8cfc55fe5cb8905d36f0d232fde7d2f30b5\""
+    },
+    "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aS3Bucket25F8FF44": {
+      "Type": "String",
+      "Description": "S3 bucket for asset \"cc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544a\""
+    },
+    "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aS3VersionKeyBFD7E367": {
+      "Type": "String",
+      "Description": "S3 key for asset version \"cc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544a\""
+    },
+    "AssetParameterscc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544aArtifactHashF8D6F90E": {
+      "Type": "String",
+      "Description": "Artifact hash for asset \"cc34ed5f79b4800a4b0289f365936c05ba864bd58b2321ca75f397edf782544a\""
+    },
+    "SsmParameterValueawsserviceeksoptimizedami118amazonlinux2recommendedimageidC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/aws/service/eks/optimized-ami/1.18/amazon-linux-2/recommended/image_id"
+    }
+  },
+  "Outputs": {
+    "eksConfigCommandDB09280A": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "aws eks update-kubeconfig --name ",
+            {
+              "Ref": "eksB49B8EA3"
+            },
+            " --region us-east-1 --role-arn ",
+            {
+              "Fn::GetAtt": [
+                "eksMastersRole8C7B8590",
+                "Arn"
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "eksGetTokenCommand8952195F": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "aws eks get-token --cluster-name ",
+            {
+              "Ref": "eksB49B8EA3"
+            },
+            " --region us-east-1 --role-arn ",
+            {
+              "Fn::GetAtt": [
+                "eksMastersRole8C7B8590",
+                "Arn"
+              ]
+            }
+          ]
+        ]
+      }
+    }
+  }
+}

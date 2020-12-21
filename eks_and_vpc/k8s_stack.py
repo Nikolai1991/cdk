@@ -10,12 +10,12 @@ from cdk_ec2_key_pair import KeyPair
 class EKSStack(core.Stack):
     def __init__(self, scope: core.Construct, id: str,
                  vpc, instance_type, managed_worker_nodes_nubmer,
-                 cluster_name, unmanaged_worker_nodes_number, **kwargs) -> None:
+                 cluster_name, unmanaged_worker_nodes_number, spot_price, key_pair, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
         #Create key pair that will be used for the K8S worker nodes
         self.key = KeyPair(
             self,"EKSKey",
-            name="kaltura",
+            name=key_pair,
             description="This is a Key Pair for EKS worker nodes"
         )
         #Create KMS key for secrets encryption
@@ -33,7 +33,7 @@ class EKSStack(core.Stack):
         self.eks_cluster = eks.Cluster(
             self, 'eks',
             cluster_name = cluster_name,
-            version= eks.KubernetesVersion.V1_17,
+            version= eks.KubernetesVersion.V1_18,
             # masters_role = masters_role,
             default_capacity = managed_worker_nodes_nubmer,
             secrets_encryption_key = self.kms_eks,
@@ -47,7 +47,7 @@ class EKSStack(core.Stack):
             self.eks_cluster.add_auto_scaling_group_capacity(
                 "EKSAutoScalingGroup",
                 instance_type = ec2.InstanceType(instance_type),
-                lifecycle=Ec2Spot
+                spot_price = spot_price,
                 desired_capacity = unmanaged_worker_nodes_number,
                 key_name = self.key.name
             )
